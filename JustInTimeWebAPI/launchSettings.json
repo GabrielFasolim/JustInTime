@@ -1,0 +1,20 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "justintimewebapi": "StartDebugging"
+      }
+    }
+  },
+  "EurekaDiscoverExample": {
+    "commandName": "Project",
+    "launchBrowser": true,
+    "launchUrl": "swagger",
+    "applicationUrl": "http://localhost:8081",
+    "environmentVariables": {
+      "ASPNETCORE_ENVIRONMENT": "Development"
+    }
+  }
+}

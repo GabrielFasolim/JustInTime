@@ -1,0 +1,188 @@
+version: "3.4"
+
+services:
+  eureka-server:
+    container_name: eureka-server
+    image: steeltoeoss/eurekaserver:latest
+    restart: on-failure
+    hostname: eureka-server
+    networks:
+      - justInTime-network
+
+  rabbitmq:
+    image: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    hostname: rabbitmq
+    networks:
+      - justInTime-network
+
+  apigateway:
+    build:
+      context: .
+      dockerfile: ./JustInTimeWebAPI/JustInTimeWebAPI/Dockerfile
+    hostname: apigateway
+    networks:
+      - justInTime-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+    ports:
+      - "8080"
+
+  userservice:
+    build:
+      context: .
+      dockerfile: ./JustInTimeUserAPI/src/backend/JustInTimeUser.API/Dockerfile
+    hostname: userservice
+    networks:
+      - justInTime-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8081
+    ports:
+      - "8081"
+
+  justintimeusers_users:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: justintimeusers_users
+      MYSQL_ROOT_PASSWORD: root
+    hostname: justintimeusers_users
+    networks:
+      - justInTime-network
+    volumes:
+      - userdb_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+networks:
+  justInTime-network:
+    driver: bridge
+
+volumes:
+  userdb_data:
+
+# services:
+#   eureka-server:
+#     container_name: eureka-server
+#     image: steeltoeoss/eurekaserver:latest
+#     restart: on-failure
+#     hostname: eureka-server
+#     networks:
+#       - locacao-network
+#
+#   rabbitmq:
+#     image: rabbitmq:3-management
+#     environment:
+#       RABBITMQ_DEFAULT_USER: user
+#       RABBITMQ_DEFAULT_PASS: password
+#     hostname: rabbitmq
+#     networks:
+#       - locacao-network
+#
+#   apigateway:
+#     build:
+#       context: .
+#       dockerfile: ./LocacaoVeiculos.ApiGateway/Dockerfile
+#     hostname: apigateway
+#     networks:
+#       - locacao-network
+#
+#   authservice:
+#     build:
+#       context: .
+#       dockerfile: ./LocacaoVeiculos.AuthService/Dockerfile
+#     hostname: authservice
+#     networks:
+#       - locacao-network
+#
+#   paymentservice:
+#     build:
+#       context: .
+#       dockerfile: ./LocacaoVeiculos.PaymentService/Dockerfile
+#     hostname: paymentservice
+#     networks:
+#       - locacao-network
+#
+#   vehicleservice:
+#     build:
+#       context: .
+#       dockerfile: ./LocacaoVeiculos.VehicleService/Dockerfile
+#     hostname: vehicleservice
+#     networks:
+#       - locacao-network
+#
+#   rentalservice:
+#     build:
+#       context: .
+#       dockerfile: ./LocacaoVeiculos.RentalService/Dockerfile
+#     hostname: rentalservice
+#     networks:
+#       - locacao-network
+#
+#   authdb:
+#     image: postgres:13
+#     environment:
+#       POSTGRES_DB: authdb
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: yourpassword
+#     hostname: localhost
+#     networks:
+#       - locacao-network
+#     volumes:
+#       - authdb_data:/var/lib/postgresql/data
+#     ports:
+#       - "5432:5432"
+#
+#   paymentdb:
+#     image: postgres:13
+#     environment:
+#       POSTGRES_DB: paymentdb
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: yourpassword
+#     hostname: localhost
+#     networks:
+#       - locacao-network
+#     volumes:
+#       - paymentdb_data:/var/lib/postgresql/data
+#     ports:
+#       - "5433:5432"
+#
+#   vehicledb:
+#     image: postgres:13
+#     environment:
+#       POSTGRES_DB: vehicledb
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: yourpassword
+#     hostname: localhost
+#     networks:
+#       - locacao-network
+#     volumes:
+#       - vehicledb_data:/var/lib/postgresql/data
+#     ports:
+#       - "5434:5432"
+#
+#   rentaldb:
+#     image: postgres:13
+#     environment:
+#       POSTGRES_DB: rentaldb
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: yourpassword
+#     hostname: localhost
+#     networks:
+#       - locacao-network
+#     volumes:
+#       - rentaldb_data:/var/lib/postgresql/data
+#     ports:
+#       - "5435:5432"
+#
+# volumes:
+#   authdb_data:
+#   paymentdb_data:
+#   vehicledb_data:
+#   rentaldb_data:
+# networks:
+#   locacao-network:
+#     driver: bridge
